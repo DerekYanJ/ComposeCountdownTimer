@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
+    var text: String by mutableStateOf("")
     var seconds: Long by mutableStateOf(0)
     var currentSeconds: Long by mutableStateOf(0)
     var countDownRunning: Boolean by mutableStateOf(false)

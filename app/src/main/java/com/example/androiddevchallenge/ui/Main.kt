@@ -21,24 +21,21 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,7 +53,6 @@ fun MainUi() {
     val viewModel: MainViewModel = viewModel()
     var seconds = 0
     val height = 300
-    var secTextState: TextFieldValue by remember{ mutableStateOf(TextFieldValue()) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,18 +63,20 @@ fun MainUi() {
         },
     ) {
         Column(Modifier.padding(10.dp)) {
-            OutlinedTextFieldDemo(secTextState, InputType.SEC) {
-                secTextState = it
-                seconds = if (it.text.isNotEmpty())
+            OutlinedTextFieldDemo(viewModel, InputType.SEC) {
+                viewModel.text = it
+                seconds = if (it.isNotEmpty())
                     try {
-                        it.text.toInt()
+                        it.toInt()
                     } catch (e: Exception) {
                         0
                     }
                 else 0
             }
-            Column(modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.Center) {
+            Column(
+                modifier = Modifier.padding(10.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
                 OutlinedButton(
                     {
                         if (viewModel.countDownRunning) {
@@ -90,7 +88,7 @@ fun MainUi() {
                         }
                     },
                     Modifier.padding(top = 10.dp),
-                    ) {
+                ) {
                     Text(text = if (viewModel.countDownRunning) "Stop the countdown" else "Start the countdown", fontSize = 18.sp)
                 }
             }
@@ -98,7 +96,8 @@ fun MainUi() {
                 Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(purple700))
+                    .background(purple700)
+            )
             AnimatedVisibility(viewModel.countDownRunning) {
                 Row(
                     Modifier
@@ -107,8 +106,9 @@ fun MainUi() {
                         .animateContentSize(),
                     horizontalArrangement = Arrangement.Center,
 
-                    ) {
-                    Text("${viewModel.currentSeconds}",
+                ) {
+                    Text(
+                        "${viewModel.currentSeconds}",
                         Modifier
                             .size(
                                 60.dp,
@@ -130,12 +130,12 @@ fun MainUi() {
 }
 
 @Composable
-fun OutlinedTextFieldDemo(textState: TextFieldValue, inputType: InputType, onValueChange: (TextFieldValue) -> Unit = {}) {
+fun OutlinedTextFieldDemo(viewModel: MainViewModel, inputType: InputType, onValueChange: (String) -> Unit = {}) {
     OutlinedTextField(
-        value = textState,
+        value = viewModel.text,
         onValueChange = {
             onValueChange.invoke(it)
-                        },
+        },
         label = {
             Text(if (inputType == InputType.MIN) "Minutes" else "Seconds")
         },
